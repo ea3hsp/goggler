@@ -105,7 +105,7 @@ func (w *Writer) write(p rfc5424.Priority, msg string) (int, error) {
 	buf := bytes.NewBuffer(b)
 	// writes message
 	logMsg.WriteTo(buf)
-	log.Infof("syslog message: %s", string(logMsg.Message))
+	log.Infof("syslog message: %s", buf.String())
 	// writer
 	res, err := logMsg.WriteTo(w.conn)
 	return int(res), err
