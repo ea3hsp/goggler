@@ -36,9 +36,17 @@ func Dial(network, raddr, appname string, p rfc5424.Priority) (*Writer, error) {
 	if p < 0 || p > rfc5424.Local7|rfc5424.Debug {
 		return nil, errors.New("log/syslog: invalid priority")
 	}
+	// if network is empty udp
+	if network == "" {
+		network = "udp"
+	}
 	// if appname is empty os.Args[0]
 	if appname == "" {
 		appname = os.Args[0]
+	}
+	// if appname is empty os.Args[0]
+	if raddr == "" {
+		return nil, errors.New("syslog server address is needed")
 	}
 	// create a writer
 	w := new(Writer)
@@ -48,6 +56,7 @@ func Dial(network, raddr, appname string, p rfc5424.Priority) (*Writer, error) {
 	w.priority = p
 	w.hostname, _ = os.Hostname()
 	w.appname = appname
+	w.network = network
 	// connection
 	err := w.connect()
 	if err != nil {
