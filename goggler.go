@@ -4,6 +4,7 @@
 package goggler
 
 import (
+	"bytes"
 	"errors"
 	"net"
 	"os"
@@ -88,6 +89,8 @@ func (w *Writer) Write(b []byte) (int, error) {
 
 // write generates and writes a syslog formatted string.
 func (w *Writer) write(p rfc5424.Priority, msg string) (int, error) {
+	// bytes holder
+	var b []byte
 	// creates a syslog RFC5424 message
 	logMsg := new(rfc5424.Message)
 	logMsg.Priority = p
@@ -98,8 +101,12 @@ func (w *Writer) write(p rfc5424.Priority, msg string) (int, error) {
 	logMsg.MessageID = ""
 	logMsg.StructuredData = []rfc5424.StructuredData{}
 	logMsg.Message = []byte(msg)
-	log.Infof("syslog message: %s", string(logMsg.Message))
+	// buffer
+	buf := bytes.NewBuffer(b)
 	// writes message
+	logMsg.WriteTo(buf)
+	log.Infof("syslog message: %s", string(logMsg.Message))
+	// writer
 	res, err := logMsg.WriteTo(w.conn)
 	return int(res), err
 }
