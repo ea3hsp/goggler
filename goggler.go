@@ -1,3 +1,4 @@
+// Albert Espín 2020 MIT
 // +build !windows,!plan9
 
 package goggler
