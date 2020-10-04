@@ -114,11 +114,10 @@ func (w *Writer) connect() (err error) {
 		w.conn = nil
 	}
 	c, err = net.Dial(w.network, w.raddr)
-	if err != nil {
-		return err
+	if err == nil {
+		w.conn = c
 	}
-	w.conn = c
-	return nil
+	return
 }
 
 // Emerg logs a message with severity LOG_EMERG
