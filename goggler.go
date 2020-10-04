@@ -98,7 +98,7 @@ func (w *Writer) write(p rfc5424.Priority, msg string) (int, error) {
 	logMsg.MessageID = ""
 	logMsg.StructuredData = []rfc5424.StructuredData{}
 	logMsg.Message = []byte(msg)
-	log.Infof("syslog message: %v", logMsg)
+	log.Infof("syslog message: %s", string(logMsg.Message))
 	// writes message
 	res, err := logMsg.WriteTo(w.conn)
 	return int(res), err
