@@ -54,6 +54,7 @@ func Dial(network, raddr, appname string, p rfc5424.Priority) (*Writer, error) {
 	// locking
 	w.mu.Lock()
 	defer w.mu.Unlock()
+	w.raddr = raddr
 	w.priority = p
 	w.hostname, _ = os.Hostname()
 	w.appname = appname
