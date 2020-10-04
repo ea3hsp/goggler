@@ -107,16 +107,17 @@ func (w *Writer) writeAndRetry(p rfc5424.Priority, s string) (int, error) {
 }
 
 func (w *Writer) connect() (err error) {
+	var c net.Conn
 	if w.conn != nil {
 		// ignore err from close, it makes sense to continue anyway
 		w.conn.Close()
 		w.conn = nil
 	}
-	var c net.Conn
 	c, err = net.Dial(w.network, w.raddr)
-	if err == nil {
-		w.conn = c
+	if err != nil {
+		return err
 	}
+	w.conn = c
 	return nil
 }
 
