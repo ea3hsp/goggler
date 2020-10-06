@@ -4,7 +4,6 @@
 package goggler
 
 import (
-	"bytes"
 	"errors"
 	"net"
 	"os"
@@ -13,7 +12,6 @@ import (
 	"time"
 
 	"github.com/crewjam/rfc5424"
-	"github.com/prometheus/common/log"
 )
 
 // A Writer is a connection to a syslog server.
@@ -83,14 +81,12 @@ func (w *Writer) Close() error {
 }
 
 // Write sends a log message to the syslog daemon.
-func (w *Writer) Write(b []byte) (int, error) {
+func (w *Writer) Write(b []byte) (int64, error) {
 	return w.writeAndRetry(w.priority, string(b))
 }
 
 // write generates and writes a syslog formatted string.
-func (w *Writer) write(p rfc5424.Priority, msg string) (int, error) {
-	// bytes holder
-	var b []byte
+func (w *Writer) write(p rfc5424.Priority, msg string) (int64, error) {
 	// creates a syslog RFC5424 message
 	logMsg := new(rfc5424.Message)
 	logMsg.Priority = p
@@ -101,17 +97,10 @@ func (w *Writer) write(p rfc5424.Priority, msg string) (int, error) {
 	logMsg.MessageID = ""
 	logMsg.StructuredData = []rfc5424.StructuredData{}
 	logMsg.Message = []byte(msg)
-	// buffer
-	buf := bytes.NewBuffer(b)
-	// writes message
-	logMsg.WriteTo(buf)
-	log.Infof("syslog message content: %s", buf.String())
-	// writer
-	res, err := logMsg.WriteTo(w.conn)
-	return int(res), err
+	return logMsg.WriteTo(w.conn)
 }
 
-func (w *Writer) writeAndRetry(p rfc5424.Priority, s string) (int, error) {
+func (w *Writer) writeAndRetry(p rfc5424.Priority, s string) (int64, error) {
 	pr := w.priority | p
 	w.mu.Lock()
 	defer w.mu.Unlock()
